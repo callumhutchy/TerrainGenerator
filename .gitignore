@@ -1,0 +1,5 @@
+﻿vcpkg_installed
+.vscode/settings.json
+build
+builds
+imgui.ini

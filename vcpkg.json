@@ -1,0 +1,10 @@
+{
+    "name": "terrain-generator",
+    "version": "1",
+    "description": "",
+    "homepage": "",
+    "license": "MIT",
+    "dependencies":[
+        "raylib"
+    ]
+}

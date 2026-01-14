@@ -1,0 +1,9 @@
+[submodule "submodules/imgui"]
+	path = submodules/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "submodules/PerlinNoise"]
+	path = submodules/PerlinNoise
+	url = https://github.com/Reputeless/PerlinNoise.git
+[submodule "submodules/cpp-profiler"]
+	path = submodules/cpp-profiler
+	url = https://github.com/callumhutchy/cpp-profiler.git
