@@ -98,7 +98,7 @@ int main()
         if (ImGui::Begin("Height Map Preview", &open))
         {
             // This makes the map no matter what the dimensions scale with the window
-            rlImGuiImageSize(&heightMap, ImGui::GetWindowWidth() - 5, ImGui::GetWindowHeight() - 5);
+            rlImGuiImageSizeV(&heightMap, {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y});
         }
         ImGui::End();
 
@@ -127,7 +127,7 @@ int main()
             {
                 SaveTerrainTypesToFile();
             }
-            
+
             /* TODO
             if(ImGui::Button("Add Region"))
             {
@@ -148,17 +148,17 @@ int main()
                 float oldHeight = regions[i].height;
                 ImGui::InputFloat(("Height##" + nameStr).c_str(), &oldHeight, 0.0f, 1.0f);
                 regions[i].height = oldHeight;
-                
+
                 float *oldColour = new float[3]{regions[i].color.r * (1.0f / 255.0f), regions[i].color.g * (1.0f / 255.0f), regions[i].color.b * (1.0f / 255.0f)};
-                if (ImGui::ColorPicker3(("Colour##" + nameStr).c_str(), oldColour), ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha)
+                if (ImGui::ColorEdit3(("Colour##" + nameStr).c_str(), oldColour), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha)
                     regions[i].color = {(unsigned char)(round(oldColour[0] * 255)), (unsigned char)(round(oldColour[1] * 255)), (unsigned char)(round(oldColour[2] * 255)), 255};
-                
-                    /* TODO - Manage deleting and adding regions
-                if (ImGui::Button(("Delete##" + nameStr).c_str()))
-                {
-                    regionsToDelete.push_back(i);
-                */
-                
+
+                /* TODO - Manage deleting and adding regions
+            if (ImGui::Button(("Delete##" + nameStr).c_str()))
+            {
+                regionsToDelete.push_back(i);
+            */
+
                 ImGui::Separator();
             }
 
