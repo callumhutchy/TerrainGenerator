@@ -28,6 +28,16 @@ DrawMode drawMode = DrawMode::NoiseMap;
 
 bool regenerateHeightMap = false;
 
+void SaveTerrainTypesToFile()
+{
+    std::ofstream outFile(terrainTypeFile, std::ios::trunc);
+    for (int i = 0; i < regions.size(); i++)
+    {
+        outFile << regions[i].ToString() << "\n";
+    }
+    outFile.close();
+}
+
 void ParseTerrainTypesFile()
 {
     std::ifstream infile(terrainTypeFile);
@@ -36,6 +46,7 @@ void ParseTerrainTypesFile()
     {
         regions.push_back(TerrainType::DeserialiseFromString(line));
     }
+    infile.close();
 }
 
 int main()
@@ -112,6 +123,56 @@ int main()
         // A Windows to add and remove regions
         if (ImGui::Begin("Region Management", &open))
         {
+            if (ImGui::Button("Save Terrain Types"))
+            {
+                SaveTerrainTypesToFile();
+            }
+            
+            /* TODO
+            if(ImGui::Button("Add Region"))
+            {
+
+            }
+            */
+
+            ImGui::Separator();
+            // If any delete buttons are pressed, record them here and then handle after
+            std::vector<int> regionsToDelete;
+            for (int i = 0; i < regions.size(); i++)
+            {
+                std::string nameStr = regions[i].name;
+                char *name = (char *)nameStr.c_str();
+                ImGui::InputText(("Name##" + nameStr).c_str(), name, 32);
+                regions[i].name = name;
+
+                float oldHeight = regions[i].height;
+                ImGui::InputFloat(("Height##" + nameStr).c_str(), &oldHeight, 0.0f, 1.0f);
+                regions[i].height = oldHeight;
+                
+                float *oldColour = new float[3]{regions[i].color.r * (1.0f / 255.0f), regions[i].color.g * (1.0f / 255.0f), regions[i].color.b * (1.0f / 255.0f)};
+                if (ImGui::ColorPicker3(("Colour##" + nameStr).c_str(), oldColour), ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha)
+                    regions[i].color = {(unsigned char)(round(oldColour[0] * 255)), (unsigned char)(round(oldColour[1] * 255)), (unsigned char)(round(oldColour[2] * 255)), 255};
+                
+                    /* TODO - Manage deleting and adding regions
+                if (ImGui::Button(("Delete##" + nameStr).c_str()))
+                {
+                    regionsToDelete.push_back(i);
+                */
+                
+                ImGui::Separator();
+            }
+
+            // Delete regions
+            /* TODO - It was deleting from the back regardless of what value for i was stored
+            for (int i = regions.size() - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < regionsToDelete.size(); j++)
+                {
+                    if (regionsToDelete[j] == i)
+                        regions.erase(std::next(regions.begin() + i));
+                }
+            }
+            */
         }
         ImGui::End();
 
