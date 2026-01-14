@@ -17,12 +17,15 @@
 #include "imgui.h"
 #include "raymath.h"
 #include "MapGenerator.h"
+#include "MeshGenerator.h"
 
 std::filesystem::path currentPath;
 std::string resourcePath;
 std::string terrainTypeFile;
 
-Texture heightMap;
+float *heightMap;
+Texture mapTexture;
+Color *colourMap;
 
 DrawMode drawMode = DrawMode::NoiseMap;
 
@@ -63,20 +66,36 @@ int main()
 
     Camera3D camera = Create3DPerspectiveCamera();
 
-    heightMap = GenerateMap(drawMode);
+    heightMap = GenerateHeightMap();
+    mapTexture = GenerateTextureFromMap(drawMode, heightMap);
+    colourMap = (drawMode == DrawMode::ColourMap) ? CreateColorMap(heightMap, mapSize) : CreateGrayscaleMap(heightMap, mapSize);
 
     rlImGuiSetup(true);
+
+    // MeshData meshData = GenerateTerrainMesh(heightMap, mapSize);
+    Mesh mapMesh = GenerateMeshFromMap(heightMap, mapSize, colourMap);
+    UploadMesh(&mapMesh, true);
+    Model mapModel = LoadModelFromMesh(mapMesh);
+
+    // mapModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = mapTexture;
 
     while (!WindowShouldClose())
     {
         {
             // Manage Controls
-            ManageCameraControls(camera);
+            ManageCameraControls(&camera);
 
             // Regenerate map
             if (IsKeyPressed(KEY_R) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || regenerateHeightMap)
             {
-                heightMap = GenerateMap(drawMode);
+                heightMap = GenerateHeightMap();
+                mapTexture = GenerateTextureFromMap(drawMode, heightMap);
+                colourMap = (drawMode == DrawMode::ColourMap) ? CreateColorMap(heightMap, mapSize) : CreateGrayscaleMap(heightMap, mapSize);
+                mapMesh = GenerateMeshFromMap(heightMap, mapSize, colourMap);
+                mapModel = LoadModelFromMesh(mapMesh);
+
+                // mapModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = mapTexture;
+
                 regenerateHeightMap = false;
             }
         }
@@ -86,6 +105,7 @@ int main()
         BeginMode3D(camera);
 
         // Draw stuff
+        DrawModel(mapModel, {0.0f - mapSize / 2, 0.0f, 0.0f - mapSize / 2}, 1.0f, WHITE);
 
         EndMode3D();
 
@@ -98,7 +118,7 @@ int main()
         if (ImGui::Begin("Height Map Preview", &open))
         {
             // This makes the map no matter what the dimensions scale with the window
-            rlImGuiImageSizeV(&heightMap, {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y});
+            rlImGuiImageSizeV(&mapTexture, {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y});
         }
         ImGui::End();
 

@@ -1,8 +1,8 @@
 #include "raylib.h"
 #include <algorithm>
 
-const int WINDOW_WIDTH = 600;
-const int WINDOW_HEIGHT = 450;
+const int WINDOW_WIDTH = 1600;
+const int WINDOW_HEIGHT = 1200;
 
 Vector2 cameraAngle = {0.7f, 0.7f};
 float cameraDistance = 200.0f;
@@ -22,7 +22,7 @@ Camera3D Create3DPerspectiveCamera(float _distance = 200.0f)
     return camera;
 }
 
-void ManageCameraControls(Camera3D camera)
+void ManageCameraControls(Camera3D * camera)
 {
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
@@ -43,7 +43,7 @@ void ManageCameraControls(Camera3D camera)
         cos(cameraAngle.y) * cos(cameraAngle.x) * cameraDistance,
         sin(cameraAngle.x) * cameraDistance,
         sin(cameraAngle.y) * cos(cameraAngle.x) * cameraDistance};
-    camera.position = newCamPos;
+    camera->position = newCamPos;
 
     if (IsKeyPressed(KEY_Z))
     {

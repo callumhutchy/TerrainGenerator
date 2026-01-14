@@ -25,6 +25,7 @@
                 "-I${fileDirname}\\..\\src",
                 "-I${fileDirname}\\..\\src\\RayLibExtras",
                 "-I${fileDirname}\\..\\src\\MapGeneration",
+                "-I${fileDirname}\\..\\src\\MeshGeneration",
                 "-I${fileDirname}\\..\\src\\Utils",
                 "-L${fileDirname}\\..\\vcpkg_installed\\x64-windows\\lib",
                 "-lraylib",

@@ -78,7 +78,7 @@ enum DrawMode
 };
 
 int seed = 12345;
-int mapSize = 1024;
+int mapSize = 256;
 float scale = 25.0f;
 int octaves = 8;
 float persistence = 0.5f;
@@ -87,38 +87,8 @@ bool normalise = true;
 
 std::vector<TerrainType> regions{};
 
-Texture2D DrawNoiseMap(float *noiseMap, unsigned int size)
+Color *CreateColorMap(float *noiseMap, unsigned int size)
 {
-    Image image;
-
-    image.width = size;
-    image.height = size;
-    image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-    image.mipmaps = 1;
-
-    Color *colourMap = new Color[size * size];
-    for (int y = 0; y < size; y++)
-    {
-        for (int x = 0; x < size; x++)
-        {
-            colourMap[y * size + x] = ColorLerp(BLACK, WHITE, noiseMap[y * size + x]);
-        }
-    }
-
-    image.data = colourMap;
-
-    return LoadTextureFromImage(image);
-}
-
-Texture2D DrawColourMap(float *noiseMap, unsigned int size)
-{
-    Image image;
-
-    image.width = size;
-    image.height = size;
-    image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-    image.mipmaps = 1;
-
     Color *colourMap = new Color[mapSize * mapSize];
 
     for (int y = 0; y < mapSize; y++)
@@ -136,26 +106,67 @@ Texture2D DrawColourMap(float *noiseMap, unsigned int size)
             }
         }
     }
+    return colourMap;
+}
 
-    image.data = colourMap;
+Color *CreateGrayscaleMap(float *noiseMap, unsigned int size)
+{
+    Color *colourMap = new Color[size * size];
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            colourMap[y * size + x] = ColorLerp(BLACK, WHITE, noiseMap[y * size + x]);
+        }
+    }
+    return colourMap;
+}
+
+Texture2D DrawNoiseMap(float *noiseMap, unsigned int size)
+{
+    Image image;
+
+    image.width = size;
+    image.height = size;
+    image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+    image.mipmaps = 1;
+
+    image.data = CreateGrayscaleMap(noiseMap, size);
 
     return LoadTextureFromImage(image);
 }
 
-Texture GenerateMap(DrawMode drawMode)
+Texture2D DrawColourMap(float *noiseMap, unsigned int size)
+{
+    Image image;
+
+    image.width = size;
+    image.height = size;
+    image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+    image.mipmaps = 1;
+
+    image.data = CreateColorMap(noiseMap, size);
+
+    return LoadTextureFromImage(image);
+}
+
+float *GenerateHeightMap()
 {
     Noise n{seed};
     float *noiseMap = n.GenerateNoiseMap(mapSize, scale, octaves, persistence, lacunarity, normalise);
+    return noiseMap;
+}
 
-    Texture heightMap;
+Texture GenerateTextureFromMap(DrawMode drawMode, float *map)
+{
+    Texture texture;
     if (drawMode == DrawMode::NoiseMap)
     {
-        heightMap = DrawNoiseMap(noiseMap, mapSize);
+        texture = DrawNoiseMap(map, mapSize);
     }
     else if (drawMode == DrawMode::ColourMap)
     {
-        heightMap = DrawColourMap(noiseMap, mapSize);
+        texture = DrawColourMap(map, mapSize);
     }
-    delete noiseMap;
-    return heightMap;
+    return texture;
 }
