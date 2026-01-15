@@ -48,7 +48,7 @@ public:
     }
 };
 
-static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap)
+static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap, float heightMultiplier)
 {
     Mesh mesh = {0};
 
@@ -86,7 +86,7 @@ static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap)
 
             // one triangle - 3 vertex
             mesh.vertices[vCounter] = (float)x * scaleFactor.x;
-            mesh.vertices[vCounter + 1] = map[x + z * mapX] * scaleFactor.y;
+            mesh.vertices[vCounter + 1] = map[x + z * mapX] * scaleFactor.y * heightMultiplier;
             mesh.vertices[vCounter + 2] = (float)z * scaleFactor.z;
 
             Color color = colourMap[x + z * mapX];
@@ -97,7 +97,7 @@ static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap)
             mesh.colors[cCounter + 3] = color.a;
 
             mesh.vertices[vCounter + 3] = (float)x * scaleFactor.x;
-            mesh.vertices[vCounter + 4] = map[x + (z + 1) * mapX] * scaleFactor.y;
+            mesh.vertices[vCounter + 4] = map[x + (z + 1) * mapX] * scaleFactor.y * heightMultiplier;
             mesh.vertices[vCounter + 5] = (float)(z + 1) * scaleFactor.z;
 
             color = colourMap[x + (z + 1) * mapX];
@@ -108,7 +108,7 @@ static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap)
             mesh.colors[cCounter + 7] = color.a;
 
             mesh.vertices[vCounter + 6] = (float)(x + 1) * scaleFactor.x;
-            mesh.vertices[vCounter + 7] = map[(x + 1) + z * mapX] * scaleFactor.y;
+            mesh.vertices[vCounter + 7] = map[(x + 1) + z * mapX] * scaleFactor.y * heightMultiplier;
             mesh.vertices[vCounter + 8] = (float)z * scaleFactor.z;
 
             color = colourMap[(x + 1) + z * mapX];
@@ -142,7 +142,7 @@ static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap)
             mesh.colors[cCounter + 19] = color.a;
 
             mesh.vertices[vCounter + 15] = (float)(x + 1) * scaleFactor.x;
-            mesh.vertices[vCounter + 16] = map[(x + 1) + (z + 1) * mapX] * scaleFactor.y;
+            mesh.vertices[vCounter + 16] = map[(x + 1) + (z + 1) * mapX] * scaleFactor.y * heightMultiplier;
             mesh.vertices[vCounter + 17] = (float)(z + 1) * scaleFactor.z;
 
             color = colourMap[(x + 1) + (z + 1) * mapX];

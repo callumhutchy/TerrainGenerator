@@ -27,6 +27,8 @@ float *heightMap;
 Texture mapTexture;
 Color *colourMap;
 
+float meshHeightMultiplier = 10.0f;
+
 DrawMode drawMode = DrawMode::NoiseMap;
 
 bool regenerateHeightMap = false;
@@ -137,6 +139,8 @@ int main()
             ImGui::Combo("Draw Mode", &drawModeNum, "Noise Map\0Colour Map\0\0");
             drawMode = (DrawMode)drawModeNum;
             regenerateHeightMap = ImGui::Button("Regenerate");
+            ImGui::Separator();
+            ImGui::SliderFloat("Mesh height multipler", &meshHeightMultiplier, 1.0f, 100.0f);
         }
         ImGui::End();
 
