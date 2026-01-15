@@ -18,19 +18,19 @@ public:
         perlin = siv::PerlinNoise{seed};
     }
 
-    float *GenerateNoiseMap(int mapSize, float scale, float octaves, float persistence, float lacunarity, bool normalise)
+    float *GenerateNoiseMap(int mapChunkSize, float scale, float octaves, float persistence, float lacunarity, bool normalise)
     {
         // 2D array block, access index with [y * mapWidth + x]
-        float *noiseMap = new float[mapSize * mapSize];
+        float *noiseMap = new float[mapChunkSize * mapChunkSize];
 
         float maxNoiseHeight = std::numeric_limits<float>::min();
         float minNoiseHeight = std::numeric_limits<float>::max();
 
-        float halfSize = mapSize / 2;
+        float halfSize = mapChunkSize / 2;
 
-        for (int y = 0; y < mapSize; y++)
+        for (int y = 0; y < mapChunkSize; y++)
         {
-            for (int x = 0; x < mapSize; x++)
+            for (int x = 0; x < mapChunkSize; x++)
             {
                 float amplitude = 1.0f;
                 float frequency = 1.0f;
@@ -59,16 +59,16 @@ public:
                         minNoiseHeight = noiseHeight;
                     }
                 }
-                noiseMap[y * mapSize + x] = noiseHeight;
+                noiseMap[y * mapChunkSize + x] = noiseHeight;
             }
         }
         if (normalise)
         {
-            for (int y = 0; y < mapSize; y++)
+            for (int y = 0; y < mapChunkSize; y++)
             {
-                for (int x = 0; x < mapSize; x++)
+                for (int x = 0; x < mapChunkSize; x++)
                 {
-                    noiseMap[y * mapSize + x] = (noiseMap[y * mapSize + x] - minNoiseHeight) / (maxNoiseHeight - minNoiseHeight);
+                    noiseMap[y * mapChunkSize + x] = (noiseMap[y * mapChunkSize + x] - minNoiseHeight) / (maxNoiseHeight - minNoiseHeight);
                 }
             }
         }

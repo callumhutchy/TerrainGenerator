@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include <cstring>
 
+/* Not Used, currently I'm using a modified raylib function to turn a map into a mesh
 class MeshData
 {
 private:
@@ -47,13 +48,17 @@ public:
         return mesh;
     }
 };
+*/
 
-static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap, float heightMultiplier)
+static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap, float heightMultiplier, int levelOfDetail)
 {
     Mesh mesh = {0};
 
     int mapX = size;
     int mapZ = size;
+
+    int meshSimplificationIncrement = levelOfDetail == 0 ? 1 : levelOfDetail * 2;
+    int verticesPerLine = (size - 1) / meshSimplificationIncrement + 1;
 
     // NOTE: One vertex per pixel
     mesh.triangleCount = (mapX - 1) * (mapZ - 1) * 2; // One quad every four pixels
@@ -77,9 +82,9 @@ static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap, float he
     Vector3 vC = {0};
     Vector3 vN = {0};
 
-    for (int z = 0; z < mapZ - 1; z++)
+    for (int z = 0; z < mapZ - 1; z+=meshSimplificationIncrement)
     {
-        for (int x = 0; x < mapX - 1; x++)
+        for (int x = 0; x < mapX - 1; x+=meshSimplificationIncrement)
         {
             // Fill vertices array with data
             //----------------------------------------------------------
@@ -216,26 +221,27 @@ static Mesh GenerateMeshFromMap(float *map, int size, Color *colourMap, float he
     return mesh;
 }
 
-static MeshData GenerateTerrainMesh(float *heightMap, int mapSize)
+/*
+static MeshData GenerateTerrainMesh(float *heightMap, int mapChunkSize)
 {
 
-    float topLeftX = (mapSize - 1) / -2.0f;
-    float topLeftZ = (mapSize - 1) / 2.0f;
+    float topLeftX = (mapChunkSize - 1) / -2.0f;
+    float topLeftZ = (mapChunkSize - 1) / 2.0f;
 
-    MeshData meshData(mapSize);
+    MeshData meshData(mapChunkSize);
     int vertexIndex = 0;
 
-    for (int y = 0; y < mapSize; y++)
+    for (int y = 0; y < mapChunkSize; y++)
     {
-        for (int x = 0; x < mapSize; x++)
+        for (int x = 0; x < mapChunkSize; x++)
         {
-            meshData.vertices[vertexIndex] = {topLeftX + x, heightMap[y * mapSize + x], topLeftZ - y};
-            meshData.uvs[vertexIndex] = {x / (float)mapSize, y / (float)mapSize};
+            meshData.vertices[vertexIndex] = {topLeftX + x, heightMap[y * mapChunkSize + x], topLeftZ - y};
+            meshData.uvs[vertexIndex] = {x / (float)mapChunkSize, y / (float)mapChunkSize};
 
-            if (x < mapSize - 1 && y < mapSize - 1)
+            if (x < mapChunkSize - 1 && y < mapChunkSize - 1)
             {
-                meshData.AddTriangles(vertexIndex, vertexIndex + mapSize + 1, vertexIndex + mapSize);
-                meshData.AddTriangles(vertexIndex + mapSize + 1, vertexIndex, vertexIndex + 1);
+                meshData.AddTriangles(vertexIndex, vertexIndex + mapChunkSize + 1, vertexIndex + mapChunkSize);
+                meshData.AddTriangles(vertexIndex + mapChunkSize + 1, vertexIndex, vertexIndex + 1);
             }
 
             vertexIndex++;
@@ -246,3 +252,4 @@ static MeshData GenerateTerrainMesh(float *heightMap, int mapSize)
 
     return meshData;
 }
+*/

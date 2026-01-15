@@ -54,6 +54,15 @@ void ParseTerrainTypesFile()
     infile.close();
 }
 
+void RecalculateMapAndMesh(Mesh *mapMesh, Model *mapModel)
+{
+    heightMap = GenerateHeightMap();
+    mapTexture = GenerateTextureFromMap(drawMode, heightMap);
+    colourMap = (drawMode == DrawMode::ColourMap) ? CreateColorMap(heightMap, mapChunkSize) : CreateGrayscaleMap(heightMap, mapChunkSize);
+    *mapMesh = GenerateMeshFromMap(heightMap, mapChunkSize, colourMap, meshHeightMultiplier, levelOfDetail);
+    *mapModel = LoadModelFromMesh(*mapMesh);
+}
+
 int main()
 {
     PROFILE_ME;
@@ -68,18 +77,12 @@ int main()
 
     Camera3D camera = Create3DPerspectiveCamera();
 
-    heightMap = GenerateHeightMap();
-    mapTexture = GenerateTextureFromMap(drawMode, heightMap);
-    colourMap = (drawMode == DrawMode::ColourMap) ? CreateColorMap(heightMap, mapSize) : CreateGrayscaleMap(heightMap, mapSize);
-
     rlImGuiSetup(true);
 
-    // MeshData meshData = GenerateTerrainMesh(heightMap, mapSize);
-    Mesh mapMesh = GenerateMeshFromMap(heightMap, mapSize, colourMap);
+    Mesh mapMesh;
+    Model mapModel;
+    RecalculateMapAndMesh(&mapMesh, &mapModel);
     UploadMesh(&mapMesh, true);
-    Model mapModel = LoadModelFromMesh(mapMesh);
-
-    // mapModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = mapTexture;
 
     while (!WindowShouldClose())
     {
@@ -90,14 +93,7 @@ int main()
             // Regenerate map
             if (IsKeyPressed(KEY_R) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || regenerateHeightMap)
             {
-                heightMap = GenerateHeightMap();
-                mapTexture = GenerateTextureFromMap(drawMode, heightMap);
-                colourMap = (drawMode == DrawMode::ColourMap) ? CreateColorMap(heightMap, mapSize) : CreateGrayscaleMap(heightMap, mapSize);
-                mapMesh = GenerateMeshFromMap(heightMap, mapSize, colourMap);
-                mapModel = LoadModelFromMesh(mapMesh);
-
-                // mapModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = mapTexture;
-
+                RecalculateMapAndMesh(&mapMesh, &mapModel);
                 regenerateHeightMap = false;
             }
         }
@@ -107,7 +103,7 @@ int main()
         BeginMode3D(camera);
 
         // Draw stuff
-        DrawModel(mapModel, {0.0f - mapSize / 2, 0.0f, 0.0f - mapSize / 2}, 1.0f, WHITE);
+        DrawModel(mapModel, {0.0f - mapChunkSize / 2, 0.0f, 0.0f - mapChunkSize / 2}, 1.0f, WHITE);
 
         EndMode3D();
 
@@ -129,7 +125,7 @@ int main()
         if (ImGui::Begin("Height Map Regenerate", &open))
         {
             ImGui::InputInt("Seed", &seed);
-            ImGui::SliderInt("Map Size", &mapSize, 10, 1024);
+            ImGui::SliderInt("Map Size", &mapChunkSize, 10, 1024);
             ImGui::SliderFloat("Scale", &scale, 0.0f, 200.0f);
             ImGui::SliderInt("Octaves", &octaves, 1, 20);
             ImGui::SliderFloat("Persistence", &persistence, 0.0f, 1.0f);

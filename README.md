@@ -5,6 +5,7 @@ Following [Sebastian Lague's Procedural Landmass Generation](https://www.youtube
 ### Current Progress
 
 <img src="./resources/screenshots/WIP_1.png">
+<img src="./resources/screenshots/WIP_2.png">
 
 ### Building
 

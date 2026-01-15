@@ -78,29 +78,31 @@ enum DrawMode
 };
 
 int seed = 12345;
-int mapSize = 256;
+int mapChunkSize = 241;
+int levelOfDetail = 0; //0-6 * 2
 float scale = 25.0f;
 int octaves = 8;
 float persistence = 0.5f;
 float lacunarity = 2.0f;
 bool normalise = true;
 
+
 std::vector<TerrainType> regions{};
 
 Color *CreateColorMap(float *noiseMap, unsigned int size)
 {
-    Color *colourMap = new Color[mapSize * mapSize];
+    Color *colourMap = new Color[mapChunkSize * mapChunkSize];
 
-    for (int y = 0; y < mapSize; y++)
+    for (int y = 0; y < mapChunkSize; y++)
     {
-        for (int x = 0; x < mapSize; x++)
+        for (int x = 0; x < mapChunkSize; x++)
         {
-            float currentHeight = noiseMap[y * mapSize + x];
+            float currentHeight = noiseMap[y * mapChunkSize + x];
             for (int i = 0; i < regions.size(); i++)
             {
                 if (currentHeight <= regions[i].height)
                 {
-                    colourMap[y * mapSize + x] = regions[i].color;
+                    colourMap[y * mapChunkSize + x] = regions[i].color;
                     break;
                 }
             }
@@ -153,7 +155,7 @@ Texture2D DrawColourMap(float *noiseMap, unsigned int size)
 float *GenerateHeightMap()
 {
     Noise n{seed};
-    float *noiseMap = n.GenerateNoiseMap(mapSize, scale, octaves, persistence, lacunarity, normalise);
+    float *noiseMap = n.GenerateNoiseMap(mapChunkSize, scale, octaves, persistence, lacunarity, normalise);
     return noiseMap;
 }
 
@@ -162,11 +164,11 @@ Texture GenerateTextureFromMap(DrawMode drawMode, float *map)
     Texture texture;
     if (drawMode == DrawMode::NoiseMap)
     {
-        texture = DrawNoiseMap(map, mapSize);
+        texture = DrawNoiseMap(map, mapChunkSize);
     }
     else if (drawMode == DrawMode::ColourMap)
     {
-        texture = DrawColourMap(map, mapSize);
+        texture = DrawColourMap(map, mapChunkSize);
     }
     return texture;
 }
